@@ -1,0 +1,25 @@
+<h2>Welcome</h2>
+
+<table>
+    <thead>
+        <tr>
+            <td>Name</td>
+            <td>Token</td>
+            <td>Action</td>
+        <tr>
+    </thead>
+    <tbody>
+
+        {{#each users}}
+        <tr>
+            <td>{{name}}</td>
+            <td>{{token}}</td>
+            <td>
+                <form action="plus" method="post">
+                    <button type="submit" name="plus_one" value={{name}}>Plus1</button>
+                </form>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
