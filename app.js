@@ -3,7 +3,7 @@ const express_handlebars = require("express-handlebars");
 const body_parser = require("body-parser");
 
 const app = express();
-const port_num = 3000;
+const port_num = process.env.PORT || 3000;
 
 let web_data = {
     users: [
