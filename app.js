@@ -1,37 +1,28 @@
 const express = require("express");
 const express_handlebars = require("express-handlebars");
 const body_parser = require("body-parser");
+const mongoose = require("mongoose");
 
 const app = express();
 const port_num = process.env.PORT || 3000;
 
-let web_data = {
-    users: [
-        {
-            name: "Olin",
-            token: 1
-        },
-        {
-            name: "Clara",
-            token: 1
-        },
-        {
-            name: "Edo",
-            token: 1
-        },
-    ]
-}
+const password = process.env.DB_PASSWORD;
 
-function plus_one_to(web_data, name_to_find) {
-    let user_index = web_data.users.findIndex((user) => {
-        console.log(user.name)
-        return user.name == name_to_find
-    });
+mongoose.connect(`mongodb+srv://root:${password}@cluster0-2ojqq.mongodb.net/pair?retryWrites=true&w=majority`, { useNewUrlParser: true })
+    .then(() => console.log("Connected to mongodb+srv")).catch(err => console.log(err));
+var db = mongoose.connection;
 
-    if (user_index != -1) {
-        web_data.users[user_index].token += 1;
+const UserModel = mongoose.model("User", {
+    "name": {
+        type: String,
+        trim: true,
+        minlength: 1,
+        required: true
+    },
+    "token": {
+        type: Number,
     }
-}
+})
 
 app.use(express.static(__dirname + '/public'));
 app.use(body_parser.urlencoded("extended: true"));
@@ -42,12 +33,27 @@ app.set("view engine", "handlebars");
 app.get("/", (request, response) => response.redirect("/home"));
 
 app.get("/home", (request, response) => {
-    response.render("home", web_data);
+    UserModel.find().then((users) => {
+
+        let user_list = users.map((user) => { return { id: user._id, name: user.name, token: user.token } })
+
+        response.render("home", { users: user_list });
+    })
 });
 
 app.post("/plus", (request, response) => {
-    plus_one_to(web_data, request.body.plus_one);
-    response.redirect("/home");
+    console.log(request.body)
+    UserModel.findByIdAndUpdate(request.body.id, { $set: { "token": Number(request.body.token) + 1 } })
+        .then((doc) => {
+            if (!doc) {
+
+                return response.status(404).send();
+            }
+            response.redirect("/home");
+        })
+        .catch((err) => {
+            return response.status(400).send();
+        })
 });
 
 

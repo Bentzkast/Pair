@@ -9,14 +9,14 @@
         <tr>
     </thead>
     <tbody>
-
         {{#each users}}
         <tr>
             <td>{{name}}</td>
             <td>{{token}}</td>
             <td>
                 <form action="plus" method="post">
-                    <button type="submit" name="plus_one" value={{name}}>Plus1</button>
+                    <input type="hidden" name="id" value="{{id}}">
+                    <button type="submit" name="token" value="{{token}}">Plus1</button>
                 </form>
             </td>
         </tr>
